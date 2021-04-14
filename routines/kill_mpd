@@ -1,0 +1,22 @@
+#!/bin/bash
+# ks347 '12
+
+USER=`whoami`
+
+# Check to see if mpd is already running
+echo "Checking for existing mpd processes..."
+mpdringtest 5 >/dev/null
+
+if [ $? == 0 ]; then
+    echo "An existing mpd process was found. Stopping parent and child processes..."
+    mpdallexit
+else
+    echo "No existing mpd processes found."
+fi
+
+
+echo "Performing cleanup..."
+mpdcleanup
+
+# To be extra safe, remove any stale logfiles
+sshl "rm /tmp/mpd2.logfile_$USER"

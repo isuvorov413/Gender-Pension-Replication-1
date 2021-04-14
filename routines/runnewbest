@@ -1,0 +1,9 @@
+cd ./Est$1
+#tail -n 1 bests.txt > newbest.txt
+ifort -g -o readnb.out  ../routines/readnewbest.f90
+sed s/\(empty\)/9.9999999999999999e+10/g Evaluated.txt > temp 
+cp temp Evaluated.test
+rm temp
+./readnb.out $1 $2
+cd ..
+./routines/runprog $1

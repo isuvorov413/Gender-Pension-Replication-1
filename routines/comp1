@@ -1,0 +1,21 @@
+#!/bin/bash
+
+
+for i in `cat $TMPDIR/machines.petra` ; do ping -c 1 $i  && ssh $i "ulimit -s unlimited" ; done
+
+ulimit -s unlimited
+rm a.out*
+
+cat drawhist.f90 readin.f ./_routines/dmatinv.f ./_routines/ran1.f ./_routines/vert.f evmpi.f maxu.f evfun.f ./_routines/choldc.f gettheta.f oldgetdata.f90 main.f > prog1.f90
+
+mpif90 -f90=/usr/global/intel/Compiler/11.1/046/bin/ia32/ifort -r8 -heap-arrays -O2 -implicitnone -lmpich ./prog1.f90
+./patch.pl a.out
+
+
+
+
+
+
+
+
+

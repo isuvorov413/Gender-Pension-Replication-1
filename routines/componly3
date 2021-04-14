@@ -1,0 +1,26 @@
+#!/bin/bash
+
+
+#for i in `cat ./machines.petra` ; do ping -c 1 $i  && ssh $i "ulimit -s unlimited" ; done
+
+ulimit -s unlimited
+#rm a.out*
+
+
+cat msmV7.f90 ./drawhist.f90 readin.f90 ./createinputfile.f90 ./dmatinv.f90 ./ran1.f90 ./vert.f90 evmpi.f90 ./maxutype.f90 evfun2.f90 choldc.f90 gettheta.f90 getdata.f90 main.f90 > prog1.f90
+
+#ifort -r8 -heap-arrays -O2 -implicitnone -I/usr/include/openmpi-x86_64 -L/usr/lib64/openmpi/lib -lmpi_f90 ./prog1.f90 -o a.out
+#mpif90 -f90=/usr/global/intel/Compiler/11.1/046/bin/ia32/ifort -r8 -heap-arrays -O2 -implicitnone -lmpich ./prog1.f90 -o  a.out
+
+mpif90 -r8 -heap-arrays -O2 -implicitnone -lmpi ./prog1.f90 -o a.out
+
+./patch.pl a.out
+
+
+
+
+
+
+
+
+

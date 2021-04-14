@@ -1,0 +1,7 @@
+echo "set estimation to 0!"
+echo "set skiploop to 1?"
+./routines/compdbg
+cd ./Est$1
+cp ../d.out d.out
+cp ../prog1.f90 prog1.f90
+gdb d.out

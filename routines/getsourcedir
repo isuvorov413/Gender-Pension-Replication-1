@@ -1,0 +1,22 @@
+
+DIR=$1
+SOURCEDIR=$2
+
+#echo "Source Directory?";read  -n100 SOURCEDIR;echo "$SOURCEDIR"
+echo "source directory content";ls -t $SOURCEDIR;echo ""
+echo "$SOURCEDIR" > ./sourcedir
+
+cp -t $DIR/source $SOURCEDIR/source/*
+cp -t $DIR/inputs $SOURCEDIR/inputs/*
+#cp -t $DIR/outputs $SOURCEDIR/outputs/*
+cp $SOURCEDIR/infile.asc $DIR/infile.asc
+cp $SOURCEDIR/input.txt $DIR/input.txt
+
+cd $DIR
+
+#cp ./inputs/input.txt input.txt
+#cp ./inputs/infile.asc infile.asc
+
+
+
+

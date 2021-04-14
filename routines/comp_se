@@ -1,0 +1,42 @@
+#!/bin/bash
+
+
+#for i in `cat ./machines.petra` ; do ping -c 1 $i  && ssh $i "ulimit -s unlimited" ; done
+
+ulimit -s unlimited
+rm c.out*
+
+cat \
+./../_newpension90type/source/getstate.f90 \
+./../_newpension90type/source/msm.f90 \
+./../_newpension90type/source/drawhist.f90 \
+./../_newpension90type/source/readin.f90 \
+./../_newpension90type/source/createinputfile.f90 \
+./../_newpension90type/source/dmatinv.f90 \
+./../_newpension90type/source/ran1.f90 \
+./../_newpension90type/source/vert.f90 \
+./source/evmpi_se.f90 \
+./../_newpension90type/source/maxutype.f90 \
+./../_newpension90type/source/evfun.f90 \
+./../_newpension90type/source/choldc.f90 \
+./../_newpension90type/source/gettheta.f90 \
+./../_newpension90type/source/getdata.f90 \
+./../_newpension90type/source/main.f90 \
+./../_newpension90type/source/contvalue.f90 \
+./../_newpension90type/source/paramsinterp.f90 \
+./../_newpension90type/source/piksrt.f90 \
+./../_newpension90type/source/readtheta.f90 \
+./../_newpension90type/source/utilfunction.f90 \
+> prog1.f90
+
+#mpif90 -r8 -heap-arrays -g -O0 -check bounds -check all -traceback -fstack -protector -assume protect_parens  -implicitnone -lmpi ./prog1.f90 -o a.out
+mpif90 -r8 -heap-arrays -O3 -g -implicitnone -lmpi  ./prog1.f90 -o a.out
+mv a.out c.out
+
+
+
+
+
+
+
+
