@@ -10,12 +10,3 @@ cat drawhist.f90 readin.f ./_routines/dmatinv.f ./_routines/ran1.f ./_routines/v
 
 mpif90 -f90=/usr/global/intel/Compiler/11.1/046/bin/ia32/ifort -r8 -heap-arrays -O2 -implicitnone -lmpich ./prog1.f90
 ./patch.pl a.out
-
-
-
-
-
-
-
-
-
