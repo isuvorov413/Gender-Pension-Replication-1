@@ -1,0 +1,19 @@
+DIR=$1
+
+echo "working directory content";ls -t $DIR; echo ""
+
+if [ ! -d "$DIR" ]; then
+	mkdir $DIR
+fi
+if [ ! -d "$DIR/inputs" ]; then
+	mkdir $DIR/inputs
+fi
+if [ ! -d "$DIR/outputs" ]; then
+	mkdir $DIR/outputs
+fi
+if [ ! -d "$DIR/source" ]; then
+	mkdir $DIR/source 
+fi
+
+#echo "erasing old outputs"; rm $DIR/outputs/*
+

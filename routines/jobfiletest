@@ -1,0 +1,38 @@
+# Specify the shell to use
+#$ -S /bin/bash
+
+# Specifies that MPI will be used with 50 workers
+# and that I will use the the "mpi" parallel environment
+
+# This option exports environment variables
+# This allows any environment variables I set below
+# using export to be available to all workers
+#$ -V
+
+# This sets an environment variable
+# In many use cases, you will not have to set these
+# and the command is commented out in this example
+#export SOME_ENV_VARIABLE=value_of_env_variable
+
+# Execute from current workind directory (cwd)
+#$ -cwd
+
+# Require 0.2 gigabytes for each worker
+#$ -l mem_free=0.2G
+
+# The name of my output log (errors are also written here)
+# If you want to see the output log as it is being generated
+# you may run "tail output.txt -f" from the terminal
+#$ -j y
+
+# The queue I am submitting my job to
+#$ -q all.q
+
+# The name of my job (to easily identify it in the queue)
+#$ -N Toddjoubert1023
+
+# This now runs the job using mpirun. NSLOTS is defined when
+
+# I set the parallel environment variable above
+
+mpiexec -n $NSLOTS  ./a.out infile.asc outfile.asc 1

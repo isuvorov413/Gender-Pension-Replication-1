@@ -1,0 +1,7 @@
+DIR=$1
+
+echo "Current date and time %s\n" "$now" >> ../out.$DIR
+echo "working directory: $DIR" >> ../out.$DIR
+echo "source directory: $SOURCEDIR" >> ../out.$DIR
+echo "specification:" >> ../out.$DIR
+grep -e 'reformimp = ' -e 'debug = ' -e 'estimation = ' -e 'stderrors = ' ./source/prog1.f90 >> ../out.$DIR

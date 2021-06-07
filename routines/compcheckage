@@ -1,0 +1,13 @@
+ulimit -s unlimited
+rm a.out*
+
+/usr/local/mpich/1.2.7/x86_64/intel/ssh/bin/mpif90  check_age_info.f90  -xW -lmpich
+/home/mtincani/_newprog4/patch.pl a.out
+/usr/local/mpich/1.2.7/x86_64/intel/ssh/bin/mpirun -np 1 a.out 
+
+
+
+
+
+
+

@@ -1,0 +1,56 @@
+#!/bin/bash
+
+
+#for i in `cat ./machines.petra` ; do ping -c 1 $i  && ssh $i "ulimit -s unlimited" ; done
+
+ulimit -s unlimited
+#rm a.out*
+
+#cd source
+
+#ifort -c *.f90
+dos2unix source/*
+rm ./source/prog1.f90
+rm *.o
+
+cat \
+./source/getstate.f90 \
+./source/msm.f90 \
+./source/drawhist.f90 \
+./source/readin.f90 \
+./source/createinputfile.f90 \
+./source/dmatinv.f90 \
+./source/ran1.f90 \
+./source/vert.f90 \
+./source/evmpi_se.f90 \
+./source/maxutype.f90 \
+./source/evfun.f90 \
+./source/choldc.f90 \
+./source/gettheta.f90 \
+./source/getdata.f90 \
+./source/main.f90 \
+./source/contvalue.f90 \
+./source/paramsinterp.f90 \
+./source/piksrt.f90 \
+./source/readtheta.f90 \
+./source/utilfunction.f90 \
+> ./prog1.f90
+
+#ifort -r8 -heap-arrays -O2 -implicitnone -I/usr/include/openmpi-x86_64 -L/usr/lib64/openmpi/lib -lmpi_f90 ./prog1.f90 -o a.out
+#mpif90 -f90=/usr/global/intel/Compiler/11.1/046/bin/ia32/ifort -r8 -heap-arrays -O2 -implicitnone -lmpich ./prog1.f90 -o  a.out
+
+
+mpif90 -r8 -heap-arrays -g -implicitnone -lmpi ./prog1.f90 -o d.out
+#mpif90 -r8 -heap-arrays -O2 -implicitnone -lmpi ./prog1.f90 -o a.out
+
+./routines/patch.pl d.out
+
+
+
+
+
+
+
+
+
+

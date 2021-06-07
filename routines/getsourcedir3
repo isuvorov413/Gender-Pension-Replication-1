@@ -1,0 +1,21 @@
+
+DIR=$1
+
+#echo "Source Directory?";read  -n10 SOURCEDIR;echo "$SOURCEDIR"
+
+SOURCEDIR=Sardar
+echo "source directory content";ls -t $SOURCEDIR;echo ""
+echo "$SOURCEDIR" > ./sourcedir
+
+cp -t $DIR/source $SOURCEDIR/source/*
+cp -t $DIR/inputs $SOURCEDIR/inputs/*
+#cp -t $DIR/outputs $SOURCEDIR/outputs/*
+
+cd $DIR
+
+cp ./inputs/input.txt input.txt
+cp ./inputs/infile.asc infile.asc
+
+
+
+

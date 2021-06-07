@@ -1,0 +1,384 @@
+###################READ USER INPUT#################################
+echo "Press:"
+echo "(0) Debug"
+echo "(1) Run Model"
+echo "(2) Estimate Model"
+echo "(3) Compute Standard Errors"
+#echo "(4) Calculate Weighting Matrices"
+echo "(5) Get Current Min"
+echo "(15) split large files"
+read  -n2 NUM
+#NUM=1
+echo ""
+
+case $NUM in
+
+
+###################DEBUG MODEL#######################################
+0)
+SOURCEDIR=NewSample
+
+DIR=Debug 				
+rm out.$DIR
+echo "removing old outputs"; rm $DIR/outputs/*
+
+./routines/getsourcedir $DIR $SOURCEDIR
+
+./routines/makeprog $DIR
+cd $DIR
+
+## Set some options manually
+sed -i 's@reformimp = .@reformimp = 0@'         ./source/prog1.f90
+sed -i 's@debug = .@debug = 1@'                 ./source/prog1.f90
+sed -i 's@estimation = .@estimation = 0@'       ./source/prog1.f90
+sed -i 's@stderrors = .@stderrors = 0@'         ./source/prog1.f90
+sed -i 's@skiploop = .@skiploop = 1@g' 			./source/prog1.f90
+sed -i 's@silent = .@silent = 0@g' 				./source/prog1.f90
+sed -i "s@...... Potential number@ 1000 Potential number@"         	./inputs/input.txt
+sed -i "s@...... Actual number@  1000 Actual number@"       		./inputs/input.txt
+sed -i "s@...... Number of Monte@    1 Number of Monte@"   			./inputs/input.txt
+sed -i "s@...... number of people@    1 number of people@"   		./inputs/input.txt
+sed -i "s@...... Number of types@     4 Number of types@" 			./inputs/input.txt
+sed -i 's@maxfam = .......@maxfam = 100@g' 							./source/prog1.f90
+sed -i 's@nyrs = ..@nyrs = 5@g' 									./source/prog1.f90
+
+#Indicate which parameter to bump, if any
+sed -i "s@ibump = ..@ibump = 34@g"  			./source/prog1.f90
+sed -i "s@bumpsize = ...@bumpsize = 0\.1@g" 	./source/prog1.f90
+sed -i "s@bumpup = ..@bumpup = 0@g" 			./source/prog1.f90
+
+mpif90 -O0 -traceback -check bounds -check uninit -debug all -gen-interfaces -warn interfaces -fpe-all=3 -fp-model strict -r8 -heap-arrays -g -implicitnone -lmpi ./source/prog1.f90 -o d.out
+
+gdb ./d.out 
+;;
+
+######RUN MODEL#######################################
+1)
+
+INITDIR=$(pwd)
+
+for i in 1000   #number of state draws for emax interpolation
+do
+for j in  10    #number of shocks used for numerical integration
+do
+for k in 15     #number of saving decisions
+do
+for c in 2     	#number of clones to simulate 
+do
+for pe in  99  	#index of counterfactuals (99 is for baseline run)
+do
+
+	## if computing the gradient for standard errors (par>0), bump corresponding parameter up and down
+	bumpsize=0\.001
+	for up in 0 2 
+	do
+		## Chose parameters for which gradient is being computed
+#		paramlist=`cat notexist$up` #subset of parameters for which the gradient was not computed yet 
+		paramlist=" 0 "  			#0 when not computing the gradient
+		echo "$paramlist"	
+		
+		for par in $paramlist
+		do
+			## Chose local directory in which to store results, inputs and source code
+			echo "Working Directory?"; read  -n100 DIR;echo "$DIR"
+			#DIR=Counterfactuals/$pe
+			#DIR=Gradient/$par/$up
+			#mkdir Gradient/$par
+			./routines/mkworkdir $DIR
+			
+			#import input and source files from another folder
+			SOURCEDIR=Current
+			./routines/getsourcedir $DIR $SOURCEDIR    
+			
+			#create prog1.f90, which concatenates all subroutines
+			./routines/makeprog $DIR
+			
+			rm a.out
+			rm out.$pe$par$up
+
+			echo "Switch dir"
+			cd $DIR
+	
+			## Update prog1.f90 code to reflect current options
+			sed -i "s@ibump = ..@ibump = $par@g"  			./source/prog1.f90
+			sed -i "s@bumpsize = ...@bumpsize = $bumpsize@g" 	./source/prog1.f90
+			sed -i "s@bumpup = ..@bumpup = $up@g" 			./source/prog1.f90
+
+			echo "Set baseline program parameters"
+			sed -i 's@wageparams = .@wageparams = 0@g' ./source/prog1.f90
+			sed -i 's@typeparams = .@typeparams = 0@g' ./source/prog1.f90
+			sed -i 's@prefparams = .@prefparams = 0@g' ./source/prog1.f90
+			sed -i 's@segmentparams = .@segmentparams = 0@g' ./source/prog1.f90
+			sed -i 's@skiploop = .@skiploop = 0@g' ./source/prog1.f90
+			sed -i 's@reform = .@reform = 0@'         ./source/prog1.f90
+			sed -i 's@debug = .@debug = 0@'                 ./source/prog1.f90
+			sed -i 's@silent = .@silent = 1@g' ./source/prog1.f90
+			sed -i 's@estimation=.@estimation=0@'           ./source/prog1.f90
+			sed -i 's@estimation = .@estimation = 0@'       ./source/prog1.f90
+			sed -i 's@stderrors = .@stderrors = 0@'         ./source/prog1.f90
+			sed -i "s@parameter :: numa1cat = ..@parameter :: numa1cat = ${k}@"     ./source/prog1.f90
+			sed -i "s@...... Number of types@     4 Number of types@" ./inputs/input.txt
+			sed -i "s@...... Potential number@  $i Potential number@"         ./inputs/input.txt
+			sed -i "s@...... Actual number@  $i Actual number@"       ./inputs/input.txt
+			sed -i "s@...... Number of Monte@    $j Number of Monte@"   ./inputs/input.txt
+			sed -i "s@...... number of people@    $c number of people@"   ./inputs/input.txt
+			sed -i 's@maxfam = .......@maxfam = 99999999@g' ./source/prog1.f90
+			sed -i 's@nyrs = ..@nyrs = 5@g' ./source/prog1.f90
+	
+	
+		
+			## alter policy parameters based on each policy experiments
+			echo "scenario nb: $pe"
+			case $pe in
+				## Baseline run
+				99)
+        			sed -i 's@skiploop = .@skiploop = 1@g' ./source/prog1.f90
+				;;
+				## Old system
+				0)
+        			sed -i 's@nyrs = ..@nyrs = 26@g' ./source/prog1.f90
+				;;
+				## Reform
+				1)
+        			sed -i 's@reform = .@reform = 1@'         ./source/prog1.f90
+        			sed -i 's@nyrs = ..@nyrs = 26@g' ./source/prog1.f90
+				;;
+				## 14% contribution rate
+				2)
+        			sed -i 's@reform = .@reform = 1@'         ./source/prog1.f90
+				sed -i 's@tao_ref = ....@tao_ref = 0\.14@'	./source/prog1.f90
+        			sed -i 's@counterfactual = .@counterfactual = 2@'         ./source/prog1.f90
+        			sed -i 's@nyrs = ..@nyrs = 26@g' ./source/prog1.f90
+				;;
+				## Equating retirement age
+				3) 	
+        			sed -i 's@reform = .@reform = 1@'         ./source/prog1.f90
+				sed -i 's@wageret_ref = ..@wageret_ref = 65@g' ./source/prog1.f90
+        			sed -i 's@counterfactual = .@counterfactual = 3@'         ./source/prog1.f90
+        			sed -i 's@nyrs = ..@nyrs = 26@g' ./source/prog1.f90
+				;;
+				## Spousal contributions
+				4)
+        			sed -i 's@reform = .@reform = 1@'         ./source/prog1.f90
+        			sed -i 's@counterfactual = .@counterfactual = 4@'         ./source/prog1.f90
+        			sed -i 's@nyrs = ..@nyrs = 26@g' ./source/prog1.f90
+				;;
+				## Spousal contributions v2
+				5) 
+        			sed -i 's@reform = .@reform = 1@'         ./source/prog1.f90
+        			sed -i 's@counterfactual = .@counterfactual = 5@'         ./source/prog1.f90
+        			sed -i 's@nyrs = ..@nyrs = 26@g' ./source/prog1.f90
+				;;
+				## Gender neutral life tables
+				6)
+        			sed -i 's@reform = .@reform = 1@'         ./source/prog1.f90
+        			sed -i 's@counterfactual = .@counterfactual = 6@'         ./source/prog1.f90
+        			sed -i 's@nyrs = ..@nyrs = 26@g' ./source/prog1.f90
+				;;
+				## Reform without bono 
+				7)
+        			sed -i 's@reform = .@reform = 1@'         ./source/prog1.f90
+        			sed -i 's@nobono = .@nobono = 1@'         ./source/prog1.f90
+        			sed -i 's@counterfactual = .@counterfactual = 7@'         ./source/prog1.f90
+        			sed -i 's@nyrs = ..@nyrs = 26@g' ./source/prog1.f90
+				;;
+				## Reform without divorce rule
+				8)
+        			sed -i 's@reform = .@reform = 1@'         ./source/prog1.f90
+        			sed -i 's@nodivrule = .@nodivrule = 1@'         ./source/prog1.f90
+        			sed -i 's@counterfactual = .@counterfactual = 8@'         ./source/prog1.f90
+        			sed -i 's@nyrs = ..@nyrs = 26@g' ./source/prog1.f90
+				;;
+				## Reform without APS
+				9)
+        			sed -i 's@reform = .@reform = 1@'         ./source/prog1.f90
+        			sed -i 's@noAPS = .@noAPS = 1@'         ./source/prog1.f90
+        			sed -i 's@counterfactual = .@counterfactual = 9@'         ./source/prog1.f90
+        			sed -i 's@nyrs = ..@nyrs = 26@g' ./source/prog1.f90
+				;;
+				10)
+        			sed -i 's@reform = .@reform = 1@'         ./source/prog1.f90
+				sed -i 's@wageret_ref = ..@wageret_ref = 65@g' ./source/prog1.f90
+        			sed -i 's@counterfactual = ..@counterfactual = 10@'         ./source/prog1.f90
+        			sed -i 's@nyrs = ..@nyrs = 26@g' ./source/prog1.f90
+				;;	
+				11)
+        			sed -i 's@reform = .@reform = 1@'         ./source/prog1.f90
+        			sed -i 's@counterfactual = ..@counterfactual = 11@'         ./source/prog1.f90
+        			sed -i 's@nyrs = ..@nyrs = 26@g' ./source/prog1.f90
+				;;
+				esac
+		
+			echo "Working with $i states, $j draws and $k consumption choices, bumped parameter $par, under scenario $pe"
+			echo "When running reform scenarios, make sure pre-reform emax parameters are already stored in input foloder (pretheta)" 
+        
+			#echo "Run silently? (1/0)"; read -n10 SIL; echo "$SIL"
+        			SIL=0
+        			sed -i 's@silent = .@silent = '"$SIL"'@'                ./source/prog1.f90
+        			sed -i 's@silent=.@silent='"$SIL"'@'            		./source/prog1.f90
+	
+			echo "Compile code"
+				mpif90 -check bounds -r8 -heap-arrays -O2 -implicitnone  ./source/prog1.f90 -o b.out
+				$INITDIR/routines/patch.pl b.out
+				diff $INITDIR/$SOURCEDIR/source/prog1.f90 $DIR/source/prog1.f90 > $INITDIR/Logs/out.$pe$par$up
+	
+			echo "Initidir $INITDIR, Sourcedir $SOURCEDIR, Dir, $DIR" >>$INITDIR/Logs/out.$pe$par$up
+	        echo "Start: Current date and time %s\n" "$now" >> $INITDIR/Logs/out.$pe$par$up
+	        		mpiexec -n 1 ./b.out infile.asc outfile.asc 1 >> $INITDIR/Logs/out.$pe$par$up &
+	        
+			echo "Switch back dir"
+	        		cd $INITDIR
+			done
+			
+		if [ $par -eq 0 ] ## Exit loop after one run if not computing the gradient
+		then
+			break
+		fi	
+	done
+done
+done
+done
+done
+done
+
+;;
+
+#########################ESTIMATE MODEL#########################################################33333
+2)
+
+echo "Estimation Directory?"; read  -n10 DIR;echo "$DIR"
+
+./routines/mkworkdir $DIR
+./routines/getsourcedir $DIR    #import files from another folder
+
+rm ./$DIR/inputs/infile.asc
+rm ./$DIR/infile.asc.*
+rm ./$DIR/outfile.asc.*
+
+cd $DIR
+sed -i 's@reformimp = .@reformimp = 0@'         ./source/prog1.f90
+sed -i 's@debug = .@debug = 0@'                 ./source/prog1.f90
+sed -i 's@estimation=.@estimation=1@'           ./source/prog1.f90
+sed -i 's@estimation = .@estimation = 1@'       ./source/prog1.f90
+sed -i 's@stderrors = .@stderrors = 0@'         ./source/prog1.f90
+sed -i 's@silent = .@silent = 1@g' ./source/prog1.f90
+
+
+echo "Number of nodes"; read  -n10 NODES;
+
+cat ./source/readin.f90 ../routines/setapps.f90 > temp.f90
+mpif90 -g -o setapps.out ./temp.f90
+./setapps.out $NODES
+
+cp ./infile.asc ./inputs/infile.asc
+rm temp.f90
+
+echo "Use cached points?(0/1)"; read -n1 CACHE
+if [ $CACHE == 0 ]; then
+        rm Evaluated.txt
+fi
+
+mpif90 -r8 -heap-arrays -O2 -implicitnone -lmpi ./source/prog1.f90 -o a.out
+../routines/patch.pl a.out
+
+echo "working directory content";ls -R -t $DIR; echo ""
+
+echo "Start: Current date and time %s\n" "$now" >> ../out.$DIR
+
+export PATH=$PATH:.
+mpiexec -n $NODES --host w1lxpercc01.worldbank.org:63 HOPSPACK_main_mpi ./prog1.hops > ../out.$DIR &
+
+echo "Stop: Current date and time %s\n" "$now" >> ../out.$DIR
+
+echo "working directory: $DIR" >> ../out.$DIR
+echo "source directory: $SOURCEDIR" >> ../out.$DIR
+echo "specification:" >> ../out.$DIR
+grep -e 'reformimp = ' -e 'debug = ' -e 'estimation = ' -e 'stderrors = ' ./source/prog1.f90 >> ../out.$DIR
+
+tail -f out.$DIR
+;;
+
+
+
+###CREATE DATA MOMENTS#######################################
+10)
+DIR=Debug
+SOURCEDIR=Current
+
+rm out.$DIR
+echo "removing old outputs"; rm $DIR/outputs/*
+
+./routines/getsourcedir $DIR $SOURCEDIR
+
+cd $DIR
+dos2unix ./source/*
+cat ./source/createmdata.f90 ./source/msm.f90 > ./source/prog2.f90
+
+mpif90 -O0 -traceback -check bounds -check uninit -debug all -gen-interfaces -warn interfaces -fpe-all=3 -fp-model strict -r8 -heap-arrays -g -implicitnone -lmpi ./source/prog2.f90 -o e.out
+
+gdb ./e.out  
+
+wait
+echo "transferring datafile"
+pwd
+cd ..
+mv "./$DIR/outputs/contribution.txt" "./$SOURCEDIR/outputs/datacontribution.txt"
+mv "./$DIR/outputs/nobs.txt" "./$SOURCEDIR/outputs/nobs.txt"
+mv "./$DIR/inputs/mdata.txt" "./$SOURCEDIR/inputs/mdata.txt"
+
+;;
+
+###GET CURRENT MIN#############################
+5) echo "Get current min ..."
+
+
+echo "Estimation Directory?"; read  -n10 SOURCEDIR; echo "$SOURCEDIR"
+echo "Estimation directory content"; ls -t $SOURCEDIR; echo ""
+
+
+#Get the number of parameters that were estimated
+NPARAMS=$(sed -n '2p' $SOURCEDIR/infile.asc)
+echo "$NPARAMS"
+
+ifort -g -o ./readnb.out ./routines/readnewbest.f90
+
+#Extract the list of points that were evaluated
+sed s/\(empty\)/9.9999999999999999e+10/g $SOURCEDIR/Evaluated.txt > $SOURCEDIR/Evaluated.test
+
+#Generate infile.asc and newmin.txt with info about the best point found
+echo "Check content of estimation directory"; ls -t $SOURCEDIR
+#echo "Check content of Evaluated.test file"; tail Evaluated.test
+./readnb.out $SOURCEDIR $NPARAMS $2
+echo "Check that newmin and infile were created"; ls -t $SOURCEDIR
+
+#Create a directory from which to run the program with the best parameters
+echo "Running Directory?"; read -n10 DIR; echo "$DIR"
+./routines/mkworkdir $DIR
+
+cp $SOURCEDIR/input.txt $DIR/input.txt
+cp $SOURCEDIR/infile.asc $DIR/infile.asc
+cp -t $DIR/source $SOURCEDIR/source/*
+cp -t $DIR/inputs $SOURCEDIR/inputs/*
+cp  $SOURCEDIR/infile.asc $SOURCEDIR/infile.best
+
+;;
+
+###SPLIT BIG OUTPUT FILES#############################
+15)
+for i in 1 2 3 4 5 6 7 8 9 10 11
+do 
+	cd Counterfactuals/$i/outputs
+	ls -lh
+	split -b 50M simdata.asc simdat
+	rm simdata.asc
+	rm R21*
+	rm emax*
+	ls -lh
+	cd ../../..
+done
+
+;;
+*) echo "Exiting" ;;
+esac
+
+

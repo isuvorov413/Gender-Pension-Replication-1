@@ -1,0 +1,8 @@
+echo "Default options (1/0)?"; read -n10 OPT; echo "$OPT"
+
+if [ $OPT=1 ]; then
+	exit
+fi
+
+if [ $OPT=0 ]; then
+	echo "run reform?"; read -n10

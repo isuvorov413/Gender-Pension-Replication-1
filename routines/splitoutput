@@ -1,0 +1,2 @@
+split -b 50M ./../Counterfactuals/10/outputs/simdata.asc simdata
+

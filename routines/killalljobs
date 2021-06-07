@@ -1,0 +1,2 @@
+for i in `cat machines.petra` ; do ping -c 1 $i  && ssh $i "ps -ef | grep prog1" ; done
+for i in `cat machines.petra` ; do ping -c 1 $i  && ssh $i "kill -9 -1" ; done

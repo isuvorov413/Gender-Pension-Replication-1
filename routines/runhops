@@ -1,0 +1,43 @@
+#!/bin/bash
+
+#Generate fortran executable
+./routines/componly
+
+#Enter estimation directory and clean up
+cd ./Est$1
+
+rm infile.asc.*
+rm outfile.asc.*
+rm out.hops
+rm Evaluated.txt
+
+
+cp ../a.out a.out
+cp ../prog1.hops prog1.hops
+cp ../input.txt inputs/input.txt
+
+#NSLOTS=232
+#./start_mpd $NSLOTS ./machines.test
+
+#echo "Running with $NSLOTS..."
+
+#Call jobfile which calls hopspack
+qsub /home/clemjoub/_newpension90type/routines/jobfile $1
+
+#mpiexec -n $NSLOTS  /usr/global/bin/HOPSPACK_main_mpi /home/clemjoub/_newpension90type/prog1.hops  < /dev/null &
+
+
+#Stop the MPI daemons
+#mpdallexit
+
+#exit 0
+
+
+
+
+
+
+
+
+
+

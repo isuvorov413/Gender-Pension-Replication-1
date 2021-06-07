@@ -1,0 +1,5 @@
+cd ./$1
+cp ../a.out b.out
+rm out.test
+qsub ../routines/jobfiletest $1
+

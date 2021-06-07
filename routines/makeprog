@@ -1,0 +1,30 @@
+DIR=$1
+
+cd $DIR
+
+rm ./source/prog1.f90
+
+dos2unix ./source/*
+cat \
+./source/main.f90 \
+./source/readin.f90 \
+./source/drawhist.f90 \
+./source/paramsinterp.f90 \
+./source/evmpi.f90 \
+./source/evfun.f90 \
+./source/getdata.f90 \
+./source/maxutype.f90 \
+./source/utilfunction.f90 \
+./source/contvalue.f90 \
+./source/getstate.f90 \
+./source/gettheta.f90 \
+./source/msm.f90 \
+./source/createinputfile.f90 \
+./source/dmatinv.f90 \
+./source/ran1.f90 \
+./source/vert.f90 \
+./source/choldc.f90 \
+./source/piksrt.f90 \
+./source/readtheta.f90 \
+> ./source/prog1.f90
+

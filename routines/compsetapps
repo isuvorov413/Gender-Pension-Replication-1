@@ -1,0 +1,14 @@
+#!/bin/bash
+
+cat ./source/readin.f90 ./routines/setapps.f90 > temp.f90
+#mpif90 -f90=/usr/global/intel/Compiler/11.1/046/bin/ia32/ifort -r8 -implicitnone ./temp.f90
+#ifort -r8 -heap-arrays -O2 -implicitnone -I/usr/include/openmpi-x86_64 -L/usr/lib64/openmpi/lib -lmpi_f90 ./temp.f90
+mpif90 -g ./temp.f90
+cp a.out setapps.out 
+rm a.out
+./setapps.out
+#rm ./setapps.out
+#rm  ./temp.f90
+
+
+
