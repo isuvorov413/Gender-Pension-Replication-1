@@ -6133,6 +6133,6 @@ Start: Current date and time %s\n
  past evfun
  MSM criterion==   5002.5854302350626     
  counterloop           1
- starting time          15 :          15 :          18
- finish time          15 :          16 :          39
- elapsed wall clock time:   1.36236978    
+ starting time          19 :          18 :           0
+ finish time          19 :          19 :          50
+ elapsed wall clock time:   1.83789062    
