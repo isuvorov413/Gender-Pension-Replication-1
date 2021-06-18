@@ -2,7 +2,7 @@ PROGRAM savingsmod
 
 	implicit none
 
-	!external DrawHist,ReadIn,ran1,EVMPI,EVFUN,dp,createinputfile
+	!external DrawHist,ReadIn,ran1,EVMPI,EVFUN,createinputfile
 
 	integer retVal
 
@@ -36,8 +36,7 @@ SUBROUTINE MainProg(Out_Arg, In_Arg)
 	real(8),allocatable :: rvart(:,:,:)
 	integer,allocatable :: ivart(:,:,:)   
 	integer, allocatable :: fixvar(:,:)        
-	real(8), allocatable :: maxsafe(:)        
-	real(8) dpmat(11,3,2)
+	real(8), allocatable :: maxsafe(:)    
 	integer regind(75),intmat(75,75),numint,i,nedraw,ncounter
 	CHARACTER inarg*100,outarg*100,tag1*100,temp3
 	REAL(8) argc,cbar
@@ -117,7 +116,6 @@ SUBROUTINE MainProg(Out_Arg, In_Arg)
 
 		numz = 75+numint
 		numiter = sum(aiter(1:ncoeff,1:ktp))
-		call DP(dpmat) !!XXX
 
 		allocate(parms(numiter))
 		allocate(rvart(6,totp,numper))      

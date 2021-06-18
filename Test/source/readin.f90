@@ -131,23 +131,9 @@ end subroutine ReadIn
 
 
 SUBROUTINE dp(X)
-	
-	!---------------------------------------------------------------
-	! This subroutine reads in the info in DeathProbabilities.txt
-	! and with with fills an array of dimension (11,3,2); where
-	! the first dimension is for ages, the second for race (W,B,H);
-	! and the third for gender (male, female);
-	!--------------------------------------------------
+
 	IMPLICIT NONE
-	REAL(8), DIMENSION(11,3,2), INTENT(OUT) :: X
-	INTEGER :: i,j
-	OPEN(UNIT=1,FILE='inputs/dp.txt',POSITION='REWIND')
-	READ(1,FMT=*) 
-	READ(1,FMT=*) 
-	DO i = 1,11
-		READ(1,FMT=*) (X(i,j,1), j=1,3), (X(i,j,2), j=1,3)
-	END DO
-	CLOSE(UNIT=1) 
+	REAL(8) X
 	RETURN
 	
 END SUBROUTINE dp 
