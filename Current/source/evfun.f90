@@ -757,7 +757,7 @@ SUBROUTINE EVFUN(parms,numiter,nedraw,totp,kidmax,ktp,numper,vseed, &
 						if (smarried.eq.1.and.wage.lt.60) then !only allow divorce until wife turns 60
 							r1=0.0d-0
 							call ran1(idum,r1,1)
-							if (r1(1).lt.probvec(1)+0.01) then !adjust in simulation for the fact that divorce rates increased (unanticipated)
+							if (r1(1).lt.probvec(1)-0.01) then !adjust in simulation for the fact that divorce rates increased (unanticipated)
 								sdiv = 1
 								snivart(2,1,(kk+1):(Tbar-15))=0 ! if divorce, household becomes unmarried
 								if (sfemale.eq.1) snivart(5,1,(kk+1):(Tbar-15))=0 !if divorce and female sampled, hh no longer contains live husband

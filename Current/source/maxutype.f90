@@ -461,7 +461,7 @@ subroutine u(util,ct,o,yyevec,fixvar,ivart,rvart,fert,hw,ww,Tbar,numz,thetap, &
 	if (hw.eq.1.and.formh.eq.1) then
 	  earnh = (1-tao)*earnhf  
 	  pensionh = pensionh + tao*earnhf    ! 10% of formal earnings goes to pension
-	  taxm = earnh   !do not get taxed on contributions
+	  taxm = (1-tao)*earnh   !do not get taxed on contributions
 	end if
 	if (hw.eq.1.and.formh.eq.0) then
 	  earnh = earnhi
@@ -469,12 +469,12 @@ subroutine u(util,ct,o,yyevec,fixvar,ivart,rvart,fert,hw,ww,Tbar,numz,thetap, &
 	if (ww.eq.1.and.formw.eq.1) then
 	  earnw = (1-tao)*earnwf 
 	  pensionw = pensionw + tao*earnwf      ! 10% of formal earnings goes to pension
-	  taxw = earnw  !do not get taxed on contributions
+	  taxw = (1-tao)*earnw  !do not get taxed on contributions
 	end if
 	if (ww.eq.2.and.formw.eq.1) then
 	  earnw = (1-tao)*0.5d-0*earnwf   !earn half of a full-time worker
 	  pensionw = pensionw + tao*0.5d-0*earnwf      ! 10% of formal earnings goes to pension
-	  taxw = earnw   !do not get taxes on contributions
+	  taxw = (1-tao)*0.5d-0*earnw   !do not get taxes on contributions
 	end if
 	if (ww.eq.1.and.formw.eq.0) then
 	  earnw = earnwi 
