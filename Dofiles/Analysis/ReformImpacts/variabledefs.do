@@ -24,6 +24,7 @@ g fpasisqual=(fpenwithdraw==565236)
 g fpasisqual2=(pasiscostopt>0 & pasiscostopt!=. & (married==1 | female==1)) 
 
 * slight difference with other definition
+
 /* run: br folio clone year female married fpasisqual* pasiscostopt fpenwithdraw  mpenwithdraw if fpasisqual!=fpasisqual2
 */
 
@@ -80,3 +81,4 @@ g wagegrp3=3*int(wage/3) if female==1 | married==1
 
 g hfexpergrp=10*int(hfexper/10) if female==0 | married==1
 g wfexpergrp=10*int(wfexper/10) if female==1 | married==1
+

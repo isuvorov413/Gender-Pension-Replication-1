@@ -5,20 +5,23 @@ clear mata
  * path
 	 if c(username)=="WB452275" {
 		global path "C:\Users\WB452275\Documents\GitHub\gender-pension\"
-	 }
+	 global tablepath = "C:\Users\WB452275\Documents\GitHub\gender-pension-draft\Tables"
+}
 	 else if c(username)=="clement" {
 		global path "C:\Users\clement\Dropbox\Projects\Genderequity"
 	 }
 		else{
 		global path "C:\Genderequity"
-	 }
+	 global tablepath = "C:\Genderequity\Tables"
+}
  
 global dopath "$path\Dofiles\Analysis\ReformImpacts"
+
 global oldsyspath = "$path\Counterfactuals\0\outputs"
 global resultspath = "$path\Counterfactuals\1\outputs"
 *global oldsyspath = "$path\reformimp\outputs"
 global graphpath= "$resultspath\..\reformimp\"
-global tablepath = "C:\Genderequity\Tables"
+
 global weights ="[aw=weights06]"
 
 
@@ -48,6 +51,7 @@ cd "$resultspath"
 global fittables="$tablepath\fittables"
 
 do $dopath\variabledefs.do
+
 
 global year = "year>2009 & year<2016"
 global Tub = 75
@@ -102,6 +106,7 @@ do $dopath\graphspensions3.do
 *do $dopath\graphsLPFchge.do
 *do $dopath\graphssavings.do
 do $dopath\graphsinequality.do
+
 
 
 /*

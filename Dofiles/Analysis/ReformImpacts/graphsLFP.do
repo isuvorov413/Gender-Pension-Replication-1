@@ -22,6 +22,7 @@ egen mean1 = mean(`outcome') if $year & `restriction2', by(`xvariable')
 egen mean2 = mean(`outcome'_sim) if $year & `restriction2', by(`xvariable')
 sort `xvariable'
 twoway line mean1 mean2 `xvariable' if $year & `restriction2' $weights,`option1' `yrange'  `option3' `titlemacro' `notemacro' 
+
 graph export `outfile'.$graphformat, replace $exportoptions
 
 
@@ -44,6 +45,7 @@ egen mean1 = mean(`outcome') if $year & `restriction2', by(`xvariable')
 egen mean2 = mean(`outcome'_sim) if $year & `restriction2', by(`xvariable')
 sort `xvariable'
 twoway 	line 	mean1 mean2 `xvariable' if $year & `restriction2' $weights,`option1' `yrange' `option3'`titlemacro' `notemacro'
+
 graph export `outfile'.$graphformat, replace $exportoptions
 
 /*

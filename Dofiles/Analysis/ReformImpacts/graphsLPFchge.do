@@ -82,6 +82,7 @@ sort rank
 
 
 twoway 	line  mean1 `xvariable' if $year & `restriction2',`option1' `yrange' || line mean2 `xvariable2' if $year & `restriction3',`option1' `yrange'	`option3'`titlemacro' `notemacro'
+
 		
 graph export $graphpath/`outfile'.$graphformat, replace $exportoptions
 
@@ -110,6 +111,7 @@ local titlemacro = `"title("Reform impact on LFP by marital status") subtitle("S
 	egen mean2 = mean(`outcome') if $year & `restriction2' & `restriction4', by(`xvariable')
 	sort `xvariable'
 	twoway 	line 	mean1 `xvariable' if $year & `restriction2' & `restriction3',`option1' `yrange' || line mean2 `xvariable' if $year & `restriction2' & `restriction4',`option1' `yrange'  `notemacro' `legendmacro' `xtitlemacro' saving(temp1, replace)
+
 			
 	local outcome = "sww2chge"
 	local xvariable = "wagegrp3"
@@ -124,6 +126,7 @@ local titlemacro = `"title("Reform impact on LFP by marital status") subtitle("S
 	egen mean2 = mean(`outcome') if $year & `restriction2' & `restriction4', by(`xvariable')
 	sort `xvariable'
 	twoway 	line 	mean1 `xvariable' if $year & `restriction2' & `restriction3',`option1' `yrange' || line mean2 `xvariable' if $year & `restriction2' & `restriction4',`option1' `yrange'  `notemacro' `legendmacro' `xtitlemacro' saving(temp2, replace)
+
 			
 		
 	graph combine temp1.gph temp2.gph, r(1) c(2) `titlemacro' 
@@ -154,6 +157,7 @@ local titlemacro = `"title("Reform impact on LFP by schooling") subtitle("Simula
 	egen mean2 = mean(`outcome') if $year & `restriction2' & `restriction4', by(`xvariable')
 	sort `xvariable'
 	twoway 	line 	mean1 `xvariable' if $year & `restriction2' & `restriction3',`option1' `yrange' || line mean2 `xvariable' if $year & `restriction2' & `restriction4',`option1' `yrange' `notemacro' `legendmacro' `xtitlemacro' saving(temp1, replace)
+
 			
 	local outcome = "sww2chge"
 	local xvariable = "wagegrp3"
@@ -168,6 +172,7 @@ local restriction3 ="(W_edugrp==1 | W_edugrp==2)"
 	egen mean2 = mean(`outcome') if $year & `restriction2' & `restriction4', by(`xvariable')
 	sort `xvariable'
 	twoway 	line 	mean1 `xvariable' if $year & `restriction2' & `restriction3',`option1' `yrange' || line mean2 `xvariable' if $year & `restriction2' & `restriction4',`option1' `yrange' `notemacro' `legendmacro' `xtitlemacro' saving(temp2, replace)
+
 			
 		
 	graph combine temp1.gph temp2.gph, r(1) c(2) `titlemacro' 
